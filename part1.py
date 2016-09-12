@@ -73,12 +73,12 @@ def fitness(gen):
     sz = len(gen)
     fit = 0
     for i in xrange(0, sz):
-        vali = int(gen[i],2)
+        vali = int(gen[i], 2)
         for j in xrange(i, sz):
             valj = int(gen[j], 2)
             valDiff = abs(valj - vali)
             indexDiff = (j - i)
-            if(valDiff == indexDiff):
+            if(valDiff != indexDiff):
                 fit += 1
     return fit
 
@@ -115,7 +115,7 @@ def begin_iterations():
         mutation(children[0])
         mutation(children[1])
         if check_for_solution(children):
-            print "Solution found! Stopping in iteration #" + i
+            print "Solution found! Stopping in iteration #" + str(i)
             return
         population = select_survivors(population, children)
     print "No solution found after " + str(NUM_ITERATIONS) + " iterations"
