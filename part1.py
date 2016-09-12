@@ -3,7 +3,7 @@ import math
 
 NUM_BITS = 3
 POPULATION_SIZE = 100
-NUM_ITERATIONS = 10000
+NUM_EVALUATIONS = 10000
 RANK_SIZE = 5
 CROSSOVER_PROBABILITY = 0.9
 MUTATION_PROBABILITY = 0.4
@@ -109,15 +109,15 @@ def check_for_solution(genomes):
         
 def begin_iterations():
     population = generate_population()
-    for i in range(NUM_ITERATIONS):
+    for i in range(NUM_EVALUATIONS / len(population)):
         parents = select_parents(population)
         children = crossover(parents[0], parents[1])
         mutation(children[0])
         mutation(children[1])
         if check_for_solution(children):
-            print "Solution found! Stopping in iteration #" + str(i)
+            print "Solution found! Stopping after " + str(i * len(population)) + " evaluations"
             return
         population = select_survivors(population, children)
-    print "No solution found after " + str(NUM_ITERATIONS) + " iterations"
+    print "No solution found after " + str(NUM_EVALUATIONS) + " evaluations"
 
 begin_iterations()
