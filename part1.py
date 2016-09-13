@@ -4,6 +4,8 @@ import math
 NUM_BITS = 3
 POPULATION_SIZE = 100
 NUM_EVALUATIONS = 10000
+EVALUATION_COUNTER = 0
+GEN_CACHE = {}
 RANK_SIZE = 5
 CROSSOVER_PROBABILITY = 0.9
 MUTATION_PROBABILITY = 0.4
@@ -69,7 +71,21 @@ def mutation(child):
         bit2 = random.randint(0, len(child) - 1)
         child[bit1], child[bit2] = child[bit2], child[bit1]
 
+def hashState(gen):
+    string = ""
+    sz = len(gen)
+    for i in xrange(0,sz):
+        string += gen[i]
+    return string
+        
+
 def fitness(gen):
+    global EVALUATION_COUNTER
+    genHash = hashState(gen)
+    if genHash in GEN_CACHE.keys():
+        return GEN_CACHE[genHash]
+
+    EVALUATION_COUNTER = EVALUATION_COUNTER + 1
     sz = len(gen)
     fit = 0
     for i in xrange(0, sz):
@@ -80,6 +96,7 @@ def fitness(gen):
             indexDiff = (j - i)
             if(valDiff != indexDiff):
                 fit += 1
+    GEN_CACHE[genHash] = fit
     return fit
 
 def select_survivors(population, children):
@@ -109,15 +126,15 @@ def check_for_solution(genomes):
         
 def begin_iterations():
     population = generate_population()
-    for i in range(NUM_EVALUATIONS / len(population)):
+    for i in range(NUM_EVALUATIONS):
         parents = select_parents(population)
         children = crossover(parents[0], parents[1])
         mutation(children[0])
         mutation(children[1])
         if check_for_solution(children):
-            print "Solution found! Stopping after " + str(i * len(population)) + " evaluations"
+            print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations"
             return
         population = select_survivors(population, children)
-    print "No solution found after " + str(NUM_EVALUATIONS) + " evaluations"
+    print "No solution found after " + str(EVALUATION_COUNTER) + " evaluations"
 
 begin_iterations()
