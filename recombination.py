@@ -30,8 +30,8 @@ def transa(c1,c2):
     sz = len(c1)
     c3 = [0 for i in range(sz)]
     hashT = [False for i in range(sz+1)]
-    ci1 = random.randint(0,sz-1)
-    ci2 = random.randint(0,sz-1)
+    ci1 = 0
+    ci2 = sz-1
     for i in range(sz/2):
         ci1 = nextPosition(hashT,ci1, c1)
         if (ci1 < sz):
