@@ -126,15 +126,18 @@ def check_for_solution(genomes):
         
 def begin_iterations():
     population = generate_population()
-    for i in range(NUM_EVALUATIONS):
+    iteration_counter = 0
+    while (EVALUATION_COUNTER < NUM_EVALUATIONS):
+        iteration_counter += 1
         parents = select_parents(population)
         children = crossover(parents[0], parents[1])
         mutation(children[0])
         mutation(children[1])
         if check_for_solution(children):
-            print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations"
+            print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations and " + str(iteration_counter) + " iterations"
             return
         population = select_survivors(population, children)
-    print "No solution found after " + str(EVALUATION_COUNTER) + " evaluations"
+
+    print "No solution found after " + str(EVALUATION_COUNTER) + " evaluations and "+ str(iteration_counter) + " iterations"
 
 begin_iterations()
