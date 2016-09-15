@@ -4,12 +4,14 @@ import math
 NUM_BITS = 3
 POPULATION_SIZE = 100
 NUM_EVALUATIONS = 10000
+NUM_ITERATIONS = 1000
 EVALUATION_COUNTER = 0
 GEN_CACHE = {}
 RANK_SIZE = 5
-REPRODUCTION_FOR_CYCLE = 10
+REPRODUCTION_FOR_CYCLE = 30
 CROSSOVER_PROBABILITY = 1
-MUTATION_PROBABILITY = 0.4
+MUTATION_PROBABILITY = 0.3
+MUTATION_SIZE = 4
 
 def nextPosition(hashP, index,gen):
     szGen = len(gen)
@@ -94,9 +96,10 @@ def buildChildHash(child):
 def mutation(child):
     pm = random.random()
     if pm < MUTATION_PROBABILITY:
-        bit1 = random.randint(0, len(child) - 1)
-        bit2 = random.randint(0, len(child) - 1)
-        child[bit1], child[bit2] = child[bit2], child[bit1]
+        for i in xrange(1,MUTATION_SIZE):
+            bit1 = random.randint(0, len(child) - 1)
+            bit2 = random.randint(0, len(child) - 1)
+            child[bit1], child[bit2] = child[bit2], child[bit1]
 
 def hashState(gen):
     string = ""
@@ -158,7 +161,7 @@ def check_for_solution(genomes):
 def begin_iterations():
     population = generate_population()
     iteration_counter = 0
-    while (EVALUATION_COUNTER < NUM_EVALUATIONS):
+    while (EVALUATION_COUNTER < NUM_EVALUATIONS and iteration_counter < NUM_ITERATIONS):
         iteration_counter += 1
         parents = select_parents(population)
         children = []
