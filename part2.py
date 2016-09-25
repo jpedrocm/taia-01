@@ -17,6 +17,7 @@ CONVERGENT_EXECUTIONS = 0
 CONVERGENT_INDIVIDUALS_PER_EXECUTION = []
 MEAN_FITNESS_PER_EXECUTION = []
 ALL_POP_CONVERGED = []
+FITNESS_AVAL_PER_EXECUTION = []
 
 def nextPosition(hashP, index,gen):
     szGen = len(gen)
@@ -187,6 +188,7 @@ def begin_iterations():
             CONVERGENT_INDIVIDUALS_PER_EXECUTION.append(number_of_solutions)
             population_fitness = mean(map(lambda x : fitness(x), population))
             MEAN_FITNESS_PER_EXECUTION.append(population_fitness)
+            FITNESS_AVAL_PER_EXECUTION.append(EVALUATION_COUNTER)
             print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations and " + str(iteration_counter) + " iterations"
             print "The population mean fitness was " + str(population_fitness)
             print "There were " + str(number_of_solutions) + " convergent individuals"
@@ -222,6 +224,8 @@ def test_and_evaluate():
     std_dev_fitness = std_dev(MEAN_FITNESS_PER_EXECUTION, mean_fitness)
     mean_converged_population = mean(ALL_POP_CONVERGED)
     std_dev_converged_population = std_dev(ALL_POP_CONVERGED, mean_converged_population)
+    mean_fitness_aval = mean(FITNESS_AVAL_PER_EXECUTION)
+    std_dev_fitness_aval = std_dev(FITNESS_AVAL_PER_EXECUTION, mean_fitness_aval)
     print "There were " + str(CONVERGENT_EXECUTIONS) + " convergent executions"
     print "Mean of iterations: " + str(mean_iterations)
     print "Standard deviation of iterations: " + str(std_dev_iterations)
@@ -231,5 +235,7 @@ def test_and_evaluate():
     print "Standard deviation of individuals: " + str(std_dev_individuals)
     print "Mean of converged population: " + str(mean_converged_population)
     print "Standard deviation of converged population: " + str(std_dev_converged_population)
+    print "Mean of fitness avaliation: " + str(mean_fitness_aval)
+    print "Standard deviation of fitness avaliation: " + str(std_dev_fitness_aval)
 
 test_and_evaluate()
