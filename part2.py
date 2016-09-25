@@ -12,6 +12,11 @@ REPRODUCTION_FOR_CYCLE = 100
 CROSSOVER_PROBABILITY = 1
 MUTATION_PROBABILITY = 0.3
 MUTATION_SIZE = 4
+ITERATIONS_PER_EXECUTION = []
+CONVERGENT_EXECUTIONS = 0
+CONVERGENT_INDIVIDUALS_PER_EXECUTION = []
+MEAN_FITNESS_PER_EXECUTION = []
+ALL_POP_CONVERGED = []
 
 def nextPosition(hashP, index,gen):
     szGen = len(gen)
@@ -133,7 +138,7 @@ def select_survivors(population, children):
     combined_population.sort(key = lambda x : fitness(x), reverse=True)
     new_population = []
     for x in xrange(0,POPULATION_SIZE):
-        parentRank = [x for x in random.sample(population, RANK_SIZE)]
+        parentRank = [x for x in random.sample(combined_population, RANK_SIZE)]
         parentRank.sort(key=lambda x : fitness(x), reverse=True)
         new_population.append(parentRank[0])
     
@@ -152,15 +157,17 @@ def evaluate_genome(genome):
     return True;
 
 def check_for_solution(genomes):
+    solutions = 0
     for genome in genomes:
         genome = [int(x, 2) for x in genome]
-        if evaluate_genome(genome):
-            return True
-    return False
+        solutions += evaluate_genome(genome)
+    return solutions
         
 def begin_iterations():
+    global CONVERGENT_EXECUTIONS
     population = generate_population()
     iteration_counter = 0
+    found_solution = False
     while (EVALUATION_COUNTER < NUM_EVALUATIONS and iteration_counter < NUM_ITERATIONS):
         iteration_counter += 1
         parents = select_parents(population)
@@ -171,11 +178,58 @@ def begin_iterations():
             mutation(recombinationResult[1])
             children.append(recombinationResult[0])
 
-        if check_for_solution(children):
-            print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations and " + str(iteration_counter) + " iterations"
-            return
         population = select_survivors(population, children)
+        number_of_solutions = check_for_solution(population)
+        if number_of_solutions and not found_solution:
+            found_solution = True
+            CONVERGENT_EXECUTIONS += 1
+            ITERATIONS_PER_EXECUTION.append(iteration_counter)
+            CONVERGENT_INDIVIDUALS_PER_EXECUTION.append(number_of_solutions)
+            population_fitness = mean(map(lambda x : fitness(x), population))
+            MEAN_FITNESS_PER_EXECUTION.append(population_fitness)
+            print "Solution found! Stopping after " + str(EVALUATION_COUNTER) + " evaluations and " + str(iteration_counter) + " iterations"
+            print "The population mean fitness was " + str(population_fitness)
+            print "There were " + str(number_of_solutions) + " convergent individuals"
+        if number_of_solutions == len(population):
+            ALL_POP_CONVERGED.append(iteration_counter)
+            print "All population converged in " + str(iteration_counter) + " iterations"
+            return
 
     print "No solution found after " + str(EVALUATION_COUNTER) + " evaluations and "+ str(iteration_counter) + " iterations"
+    ALL_POP_CONVERGED.append(iteration_counter)
+    print "Population did not converge"
 
-begin_iterations()
+def mean(list_items):
+    return sum(list_items)/len(list_items)
+
+def std_dev(list_items, mean_items):
+    variance_list = map(lambda x : pow(x-mean_items, 2), list_items)
+    return math.sqrt(sum(variance_list)/len(list_items))
+
+def test_and_evaluate():
+    global EVALUATION_COUNTER
+    print "PARTE 2"
+    for j in range(0, 30):
+        print "Execution " + str(j+1)
+        EVALUATION_COUNTER = 0
+        begin_iterations()
+        print " "
+    mean_iterations = mean(ITERATIONS_PER_EXECUTION)
+    std_dev_iterations = std_dev(ITERATIONS_PER_EXECUTION, mean_iterations)
+    mean_individuals = mean(CONVERGENT_INDIVIDUALS_PER_EXECUTION)
+    std_dev_individuals = std_dev(CONVERGENT_INDIVIDUALS_PER_EXECUTION, mean_individuals)
+    mean_fitness = mean(MEAN_FITNESS_PER_EXECUTION)
+    std_dev_fitness = std_dev(MEAN_FITNESS_PER_EXECUTION, mean_fitness)
+    mean_converged_population = mean(ALL_POP_CONVERGED)
+    std_dev_converged_population = std_dev(ALL_POP_CONVERGED, mean_converged_population)
+    print "There were " + str(CONVERGENT_EXECUTIONS) + " convergent executions"
+    print "Mean of iterations: " + str(mean_iterations)
+    print "Standard deviation of iterations: " + str(std_dev_iterations)
+    print "Mean of fitness: " + str(mean_fitness)
+    print "Standard deviation of fitness: " + str(std_dev_fitness)
+    print "Mean of convergent individuals: " + str(mean_individuals)
+    print "Standard deviation of individuals: " + str(std_dev_individuals)
+    print "Mean of converged population: " + str(mean_converged_population)
+    print "Standard deviation of converged population: " + str(std_dev_converged_population)
+
+test_and_evaluate()
